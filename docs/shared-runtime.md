@@ -21,9 +21,16 @@ launcher disables Uvicorn access logging.
 
 `OTEL_TRACES_ENDPOINT` is the full explicit OTLP/HTTP trace URL. HTTPS is
 required except loopback fixtures. The installed OpenTelemetry exporter uses
-its documented certificate environment settings for a private CA. There is no
+the system certificate trust store (or an explicitly trusted private CA in the
+serving image). There is no
 automatic exception stack recording. Export queues are bounded at512 spans,
-64 per batch, two-second export timeout; a disconnected collector can lose
+64 per batch, two-second network I/O timeout, no redirects/retries and a
+2.5-second processor shutdown deadline; queued spans are discarded at shutdown
+and a stalled exporter can finish only in its single daemon thread. Error
+diagnostics are fixed messages, never collector response or exception text.
+Only the exact OpenTelemetry in-memory exporter may be injected synchronously
+for tests; arbitrary custom exporters are rejected. The tested encoding/SDK
+dependencies are pinned together. A disconnected collector can lose
 telemetry without granting access or blocking paid-work admission.
 
 `config/prometheus.yaml` is a private-network reference scrape configuration.

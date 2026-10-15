@@ -99,3 +99,67 @@ def test_valid_trace_context_links_the_request_span_without_copying_headers(capl
         records = [json.loads(r.getMessage()) for r in caplog.records if r.name == 'platform_observability']
         assert records[0]['trace_id'] == trace_id
         assert 'synthetic-private' not in str(records) + str(span.attributes)
+
+
+def test_arbitrary_synchronous_exporter_is_rejected():
+    class NetworkExporter:
+        def export(self, spans):
+            raise AssertionError('must never be invoked on the request thread')
+    with pytest.raises(ValueError, match='in-memory'):
+        instrument(FastAPI(), service_name='data', exporter=NetworkExporter())
+
+
+def test_otlp_failure_diagnostics_never_include_response_or_exception_payload(caplog):
+    import httpx
+    from platform_observability.export import SafeHTTPExporter
+    from opentelemetry.sdk.trace.export import SpanExportResult
+    app, memory = fixture()
+    with TestClient(app) as client:
+        client.get('/files/one')
+        spans = memory.get_finished_spans()
+        for failing in (False, True):
+            def transport(request):
+                if failing:
+                    raise httpx.ConnectError('synthetic-private-exception')
+                return httpx.Response(400, text='synthetic-private-response')
+            exporter = SafeHTTPExporter('https://collector.example.invalid/v1/traces',
+                                         transport=httpx.MockTransport(transport))
+            with caplog.at_level(logging.WARNING):
+                assert exporter.export(spans) is SpanExportResult.FAILURE
+            exporter.shutdown()
+    assert 'synthetic-private' not in caplog.text
+
+
+def test_batch_export_and_shutdown_are_bounded_when_exporter_stalls():
+    import threading
+    import time
+    from platform_observability.export import BoundedProcessor
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SpanExportResult
+    entered, release = threading.Event(), threading.Event()
+    class Stalled:
+        def export(self, spans):
+            entered.set()
+            release.wait(2)
+            return SpanExportResult.SUCCESS
+        def shutdown(self):
+            pass
+    provider = TracerProvider(shutdown_on_exit=False)
+    processor = BoundedProcessor(Stalled(), shutdown_timeout=.05)
+    provider.add_span_processor(processor)
+    try:
+        started = time.monotonic()
+        with provider.get_tracer('test').start_as_current_span('one'):
+            pass
+        assert time.monotonic() - started < .1
+        assert entered.wait(1)
+        # Queue is finite even while the only export worker is blocked.
+        for _ in range(600):
+            with provider.get_tracer('test').start_as_current_span('queued'):
+                pass
+        assert processor.queue_size <= 512
+        started = time.monotonic()
+        provider.shutdown()
+        assert time.monotonic() - started < .25
+    finally:
+        release.set()

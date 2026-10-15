@@ -11,11 +11,13 @@ from uuid import uuid4
 
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import SpanKind, Status, StatusCode
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from prometheus_client import CollectorRegistry, Counter, Histogram, generate_latest
 from starlette.responses import Response
+from .export import BoundedProcessor, SafeHTTPExporter
 
 _LOG = logging.getLogger('platform_observability')
 _ROUTE = re.compile(r'[A-Za-z0-9_/.{}:-]{1,256}')
@@ -32,6 +34,9 @@ class Observation:
                                   buckets=(.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10))
         self.provider = TracerProvider(resource=Resource.create({'service.name': service}))
         if exporter is not None:
+            if type(exporter) is not InMemorySpanExporter:
+                self.provider.shutdown()
+                raise ValueError('only the in-memory test exporter may be injected')
             self.provider.add_span_processor(SimpleSpanProcessor(exporter))
         elif endpoint:
             parsed = urlsplit(endpoint)
@@ -42,10 +47,7 @@ class Observation:
                 pass
             if (parsed.scheme != 'https' and not (parsed.scheme == 'http' and loopback)) or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
                 raise ValueError('telemetry requires an explicit HTTPS or loopback endpoint')
-            from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-            self.provider.add_span_processor(BatchSpanProcessor(
-                OTLPSpanExporter(endpoint=endpoint, timeout=2), max_queue_size=512,
-                max_export_batch_size=64, schedule_delay_millis=500, export_timeout_millis=2000))
+            self.provider.add_span_processor(BoundedProcessor(SafeHTTPExporter(endpoint)))
         self.tracer = self.provider.get_tracer('platform_observability')
 
     def close(self):
