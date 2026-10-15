@@ -1,5 +1,9 @@
 # platform-observability
 
+Shared Python API instrumentation and private scrape/rule configuration are
+implemented locally; see [shared runtime telemetry](docs/shared-runtime.md).
+This does not activate the older compatibility surfaces or a production stack.
+
 `Observability` platform boundary for the Book Platform portfolio.
 
 ## Scope
