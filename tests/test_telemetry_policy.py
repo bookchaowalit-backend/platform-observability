@@ -29,7 +29,7 @@ import threading
 import unittest
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -176,7 +176,7 @@ class FixtureTests(unittest.TestCase):
 
 
 class ForbiddenFieldTests(unittest.TestCase):
-    SAMPLES = {
+    SAMPLES: ClassVar[dict[str, str]] = {
         "email": "synthetic.person@example.invalid",
         "bearer_token": "Bearer synthetic0123456789token",
         "basic_auth": "Basic c3ludGhldGljOnN5bnRoZXRpYw==",
@@ -672,7 +672,9 @@ class PR1RuntimeTelemetryTests(unittest.TestCase):
 
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
-        from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+        from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+            InMemorySpanExporter,
+        )
 
         sys.path.insert(0, str(ROOT / "src"))
         self.addCleanup(sys.path.remove, str(ROOT / "src"))

@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import re
 import sys
-from datetime import datetime, timezone, tzinfo
+from datetime import UTC, datetime, tzinfo
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -208,12 +208,12 @@ _JOB_TYPE = re.compile(r"[a-z][a-z0-9_]{0,63}")
 
 def _utc(raw: Any, assume_tz: tzinfo) -> str | None:
     try:
-        moment = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+        moment = datetime.fromisoformat(str(raw))
     except ValueError:
         return None
     if moment.tzinfo is None:
         moment = moment.replace(tzinfo=assume_tz)
-    return moment.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return moment.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _count(value: Any) -> int | None:
