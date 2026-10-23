@@ -30,8 +30,11 @@ class SafeHTTPExporter:
                                     headers={'Content-Type': 'application/x-protobuf'}) as response:
                 if 200 <= response.status_code < 300:
                     return SpanExportResult.SUCCESS
-        except Exception:
-            pass
+        # Fail closed on any encode/transport error; the exception text can echo
+        # collector responses or span data, so it is deliberately never logged.
+        except Exception:  # noqa: BLE001
+            _LOG.warning('{"event":"telemetry_export_failed"}')
+            return SpanExportResult.FAILURE
         _LOG.warning('{"event":"telemetry_export_failed"}')
         return SpanExportResult.FAILURE
 
@@ -80,7 +83,8 @@ class BoundedProcessor(SpanProcessor):
                         break
                 try:
                     self._exporter.export(batch)
-                except Exception:
+                # The single export thread must survive any exporter error.
+                except Exception:  # noqa: BLE001
                     _LOG.warning('{"event":"telemetry_export_failed"}')
                 finally:
                     for _ in batch:
@@ -89,8 +93,9 @@ class BoundedProcessor(SpanProcessor):
         finally:
             try:
                 self._exporter.shutdown()
-            except Exception:
-                pass
+            # Best-effort close; never surface exception text from the exporter.
+            except Exception:  # noqa: BLE001
+                _LOG.warning('{"event":"telemetry_exporter_shutdown_failed"}')
 
     def shutdown(self):
         self._stop.set()
