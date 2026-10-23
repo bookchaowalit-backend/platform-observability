@@ -2,9 +2,9 @@ import importlib
 import json
 import logging
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 
@@ -111,8 +111,9 @@ def test_arbitrary_synchronous_exporter_is_rejected():
 
 def test_otlp_failure_diagnostics_never_include_response_or_exception_payload(caplog):
     import httpx
-    from platform_observability.export import SafeHTTPExporter
     from opentelemetry.sdk.trace.export import SpanExportResult
+
+    from platform_observability.export import SafeHTTPExporter
     app, memory = fixture()
     with TestClient(app) as client:
         client.get('/files/one')
@@ -133,9 +134,11 @@ def test_otlp_failure_diagnostics_never_include_response_or_exception_payload(ca
 def test_batch_export_and_shutdown_are_bounded_when_exporter_stalls():
     import threading
     import time
-    from platform_observability.export import BoundedProcessor
+
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import SpanExportResult
+
+    from platform_observability.export import BoundedProcessor
     entered, release = threading.Event(), threading.Event()
     class Stalled:
         def export(self, spans):

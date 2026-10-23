@@ -1,11 +1,11 @@
 """Observe fixed route templates; never collect URLs, tenant IDs or payloads."""
-from contextlib import asynccontextmanager
 import ipaddress
 import json
 import logging
 import re
 import secrets
 import time
+from contextlib import asynccontextmanager
 from urllib.parse import urlsplit
 from uuid import uuid4
 
@@ -17,6 +17,7 @@ from opentelemetry.trace import SpanKind, Status, StatusCode
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from prometheus_client import CollectorRegistry, Counter, Histogram, generate_latest
 from starlette.responses import Response
+
 from .export import BoundedProcessor, SafeHTTPExporter
 
 _LOG = logging.getLogger('platform_observability')
