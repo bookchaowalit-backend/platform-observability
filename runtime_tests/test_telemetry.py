@@ -33,7 +33,7 @@ def fixture():
 
 
 def test_metrics_are_authenticated_and_use_route_templates():
-    app, exporter = fixture()
+    app, _exporter = fixture()
     with TestClient(app) as client:
         assert client.get('/files/private-customer-id?token=private-query').status_code == 200
         assert client.get('/metrics').status_code == 401
@@ -119,7 +119,7 @@ def test_otlp_failure_diagnostics_never_include_response_or_exception_payload(ca
         client.get('/files/one')
         spans = memory.get_finished_spans()
         for failing in (False, True):
-            def transport(request):
+            def transport(request, failing=failing):
                 if failing:
                     raise httpx.ConnectError('synthetic-private-exception')
                 return httpx.Response(400, text='synthetic-private-response')
