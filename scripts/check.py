@@ -30,7 +30,7 @@ SCHEMA_RELATIVE = "schema/book-platform.contract.v1.schema.json"
 BASE_REQUIRED_FILES = ("README.md", "contract.json", "scripts/check.sh", SCHEMA_RELATIVE)
 BASE_README_HEADINGS = ("## Scope", "## Boundary", "## Local verification", "## Migration gate")
 PLACEHOLDER_RE = re.compile(r"__[A-Z][A-Z0-9_]*__")
-JSON_TYPES = {
+JSON_TYPES: dict[str, type | tuple[type, ...]] = {
     "object": dict,
     "array": list,
     "string": str,

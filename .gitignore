@@ -8,3 +8,8 @@ logs/
 dist/
 build/
 *.egg-info/
+.venv/
+.coverage
+.coverage.*
+.mypy_cache/
+.ruff_cache/

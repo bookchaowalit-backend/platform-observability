@@ -11,6 +11,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -116,7 +117,7 @@ notes:
 class RegistryAlignmentTests(unittest.TestCase):
     def setUp(self) -> None:
         self.entry = align.parse_registry(REGISTRY)["sample"]
-        self.contract = {
+        self.contract: dict[str, Any] = {
             "platform_id": "sample",
             "repository": "book-sample-platform",
             "data_owner": "none",

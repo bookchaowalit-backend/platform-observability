@@ -70,7 +70,7 @@ def validate(root: Path = ROOT, canonical: Path | None = None) -> list[str]:
         return errors
 
     pinned, pin_error = read_pin(pin)
-    if pin_error:
+    if pin_error or pinned is None:
         return [f"{PIN_RELATIVE}: {pin_error}"]
     actual = sha256_file(schema)
     if actual != pinned:

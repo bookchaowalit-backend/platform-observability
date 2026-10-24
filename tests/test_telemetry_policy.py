@@ -572,6 +572,7 @@ class SystemHealthSourceDriftTests(unittest.TestCase):
                 target = node.targets[0]
                 if isinstance(target, ast.Name) and target.id == "health":
                     for key, value in zip(node.value.keys, node.value.values):
+                        assert isinstance(key, ast.Constant) and isinstance(key.value, str), "health keys are string literals"
                         section = key.value
                         if section not in segments_by_section:
                             missing.append(section)
@@ -580,7 +581,9 @@ class SystemHealthSourceDriftTests(unittest.TestCase):
                             for emitted in _dict_keys(functions[value.func.id]) - segments_by_section[section]:
                                 missing.append(f"{section}.{emitted}")
                 elif isinstance(target, ast.Subscript) and isinstance(target.slice, ast.Constant):
-                    section = target.slice.value
+                    slice_value = target.slice.value
+                    assert isinstance(slice_value, str), "health sections are string literals"
+                    section = slice_value
                     for emitted in _dict_keys(node.value) - segments_by_section.get(section, set()):
                         missing.append(f"{section}.{emitted}")
         self.assertEqual(missing, [], "system_health emits fields with no redaction disposition")
@@ -730,7 +733,8 @@ class PR1RuntimeTelemetryTests(unittest.TestCase):
         spans = self.exporter.get_finished_spans()
         self.assertEqual(len(spans), 5)
         for span in spans:
-            attributes = {**dict(span.resource.attributes), **dict(span.attributes)}
+            assert span.end_time is not None and span.start_time is not None and span.context is not None
+            attributes = {**dict(span.resource.attributes), **dict(span.attributes or {})}
             event = {
                 "schema_version": policy.SCHEMA_VERSION, "signal": "trace", "retention_class": "trace-7d",
                 "service": "Shared_API", "environment": "ci", "observed_at": "2026-10-15T08:00:00Z",

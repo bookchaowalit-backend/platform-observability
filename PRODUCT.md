@@ -23,18 +23,28 @@ it, and every gate in `fixtures/gates/` passes in CI.
 
 ## Positioning
 
-A boundary contract with offline evidence, not a running service. The telemetry redaction and retention policy (`scripts/telemetry_policy.py`, `fixtures/telemetry/`): which fields a log or health event may carry, checked against the real `platform-api-gateway` telemetry in CI.
+A boundary contract with offline evidence plus a small, undeployed Python library:
+
+- The telemetry redaction and retention policy (`scripts/telemetry_policy.py`,
+  `fixtures/telemetry/`): which fields a log or health event may carry, checked against the
+  real `platform-api-gateway` telemetry in CI.
+- The `platform_observability` package (`src/platform_observability/`): `instrument(app, ...)`
+  adds bounded Prometheus request metrics behind a `METRICS_TOKEN`-protected `/metrics`
+  route and an OpenTelemetry tracer with a bounded OTLP/HTTP span exporter
+  (`docs/shared-runtime.md`). No service in production uses it yet.
 
 ## Operating Context
 
 - Status: `scaffolded`; DOCPACK verdict: `template`. The runtime is not activated; the current
   implementation is `infra/self-hosted-stack` in the parent registry.
-- CI: shared `ci-python` (Ruff and `scripts/check.sh` on Python 3.11 and 3.12) and the shared
-  security workflow, on GitHub-hosted runners (public repository).
-- Sentry does not apply: nothing runs in production. Add it in the change that activates a
-  runtime.
-- The open `codex/shared-infrastructure-20261015` pull request (decision D8) is outside this
-  document.
+- CI (GitHub-hosted, public repository): the contract job runs `scripts/check.sh` on Python 3.11
+  and 3.12 with the pinned `platform-api-gateway` parity tests; the shared `ci-python` job
+  installs from `uv.lock` (`uv sync --frozen`), runs Ruff, mypy, the whole pytest suite under a
+  coverage gate and a wheel build; the shared security workflow runs alongside.
+- The D8 `codex/shared-infrastructure-20261015` pull request (#1) was merged into `main` as
+  `47a91c1`; it added the package above.
+
+Sentry waiver: nothing is built into an image or deployed from this repository, so there is no runtime to report errors from.
 
 ## Capabilities and Constraints
 

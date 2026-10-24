@@ -47,14 +47,21 @@ jobs:
           REQUIRE_GATEWAY_TESTS: "1"
         run: bash scripts/check.sh
 
+  # Shared workflow: installs from uv.lock (uv sync --frozen --all-extras), runs Ruff and mypy
+  # ([tool.mypy]), the offline contract check, the whole pytest suite (tests/ + runtime_tests/,
+  # formerly shared-runtime.yml) under a coverage gate, and builds the wheel.
   offline:
     uses: bookchaowalit/platform-ci-workflows/.github/workflows/ci-python.yml@87dc5e1c7e0416886a6371d5a101bb2ccba38edd # v1.1.1
     with:
       python-version: "3.12"
-      install-command: "true" # standard library only: the step just creates the venv for this Python
       format-check: false # follow-up: adopt ruff format
-      typecheck-command: "" # follow-up: add [tool.mypy]
-      test-command: bash scripts/check.sh # offline: the contract job above adds the pinned upstream parity
+      # Ratchet: measured 90.21% on 2026-10-24 (ADR-0004: threshold = measured, rounded down).
+      # The gateway parity tests run only in the contract job above, so they are not counted here.
+      coverage-threshold: "90"
+      test-command: |
+        bash scripts/check.sh
+        python -m pytest -q --cov --cov-report=
+        uv build --wheel --out-dir dist .
 
   security:
     uses: bookchaowalit/platform-ci-workflows/.github/workflows/security.yml@87dc5e1c7e0416886a6371d5a101bb2ccba38edd # v1.1.1

@@ -50,6 +50,11 @@ there first, then copy the schema and its pin here). Pass
 checkout. `python3 scripts/check_registry_alignment.py --solo-empire ../solo-empire`
 compares this contract with the parent platform registry (local only; read-only).
 
+The `platform_observability` package (`src/`) has third-party dependencies,
+locked in `uv.lock`. Install them with `uv sync --frozen --all-extras`, then
+run `ruff check .`, `mypy` and `python -m pytest` (tests/ and runtime_tests/).
+CI runs the same through the shared `ci-python` workflow, with a coverage gate.
+
 The check validates repository shape and contract metadata only. It does not
 claim deployment, provider connectivity, data migration, or production
 readiness.

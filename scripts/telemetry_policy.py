@@ -38,7 +38,7 @@ SUPPORTED_KEYWORDS = frozenset({
     "required", "properties", "additionalProperties", "items", "minItems", "maxItems",
     "oneOf", "allOf", "not",
 })
-_TYPES = {
+_TYPES: dict[str, type | tuple[type, ...]] = {
     "object": dict, "array": list, "string": str, "boolean": bool,
     "number": (int, float), "integer": int, "null": type(None),
 }
@@ -140,10 +140,10 @@ def schema_errors(value: Any, schema: dict[str, Any], root: dict[str, Any], path
             return [f"{path} matches more than one oneOf branch"]
         # Report the branch selected by the discriminator when there is one.
         signal = value.get("signal") if isinstance(value, dict) else None
-        for branch, errors in zip(schema["oneOf"], branches):
+        for branch, branch_errors in zip(schema["oneOf"], branches):
             target = _resolve(root, branch["$ref"]) if "$ref" in branch else branch
             if target.get("properties", {}).get("signal", {}).get("const") == signal:
-                return errors
+                return branch_errors
         return [f"{path} matches no oneOf branch (unknown signal {signal!r})"]
     errors: list[str] = []
     for sub in schema.get("allOf", []):
@@ -271,7 +271,7 @@ def redact_health_snapshot(
             "grade": grade["grade"] if grade["grade"] in {"A", "B", "C", "D"} else "D",
         }
 
-    cron_raw = raw.get("cron")
+    cron_raw: Any = raw.get("cron")
     cron = _counts(cron_raw, ("total", "active", "success", "failed"))
     if cron["available"]:
         pending = _count(cron_raw.get("pending"))

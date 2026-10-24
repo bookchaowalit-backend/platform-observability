@@ -7,7 +7,7 @@ import time
 
 import httpx
 from opentelemetry.exporter.otlp.proto.common.trace_encoder import encode_spans
-from opentelemetry.sdk.trace import SpanProcessor
+from opentelemetry.sdk.trace import ReadableSpan, SpanProcessor
 from opentelemetry.sdk.trace.export import SpanExportResult
 
 _LOG = logging.getLogger('platform_observability')
@@ -45,7 +45,7 @@ class SafeHTTPExporter:
 class BoundedProcessor(SpanProcessor):
     def __init__(self, exporter, *, shutdown_timeout=2.5):
         self._exporter = exporter
-        self._queue = queue.Queue(maxsize=512)
+        self._queue: queue.Queue[ReadableSpan] = queue.Queue(maxsize=512)
         self._stop = threading.Event()
         self._active = threading.Event()
         self._shutdown_timeout = shutdown_timeout
