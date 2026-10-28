@@ -1,0 +1,36 @@
+# Synthetic BOO-160 redaction fixtures (e1b2a86): placeholder subject hashes, a JWT of a
+# synthetic subject and fake provider keys that the telemetry policy must reject.
+# Exact fingerprints only; a new real-looking secret anywhere is still reported.
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-anthropic-key.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-baht-suffix.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-basic-auth.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-card-number-spaced.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-client-request-id.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-email-in-request-id.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-google-oauth-token.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-ipv4-in-request-id.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-jwt-subject.json:jwt:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-camelcase-access-token.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-camelcase-client-ip.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-camelcase-session-id.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-credit-card.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-enduser-id.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-header-api-key.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-jwt-key.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-key-prefixed-user-email.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-lowercase-currency-code.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-openai-project-key.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-percent-encoded-email.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-schemeless-url.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-telegram-bot-token.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-thai-mobile-66.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-thai-mobile-dashed.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-thai-mobile-intl.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-thai-mobile-plain.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-thai-national-id-dashed.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-thb-code-before-amount.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-unknown-signal.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/invalid/log-wrong-retention-class.json:generic-api-key:18
+e1b2a86f8dc8928049769687e64b964217111d0e:fixtures/telemetry/valid/log-request-completed.json:generic-api-key:15
+e1b2a86f8dc8928049769687e64b964217111d0e:tests/test_telemetry_policy.py:generic-api-key:211
+e1b2a86f8dc8928049769687e64b964217111d0e:tests/test_telemetry_policy.py:stripe-access-token:187
