@@ -4,6 +4,9 @@ Shared Python API instrumentation and private scrape/rule configuration are
 implemented locally; see [shared runtime telemetry](docs/shared-runtime.md).
 This does not activate the older compatibility surfaces or a production stack.
 
+Owner decision 2026-11-04: this stays a library, with no observability service or
+scraper; see [the decision](docs/DECISION-2026-11-04-library-not-service.md).
+
 `Observability` platform boundary for the Book Platform portfolio.
 
 ## Scope
