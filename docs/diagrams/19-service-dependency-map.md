@@ -9,7 +9,7 @@ flowchart LR
   end
   core --> starlette["starlette >=0.46,<2"]
   core --> promc["prometheus-client >=0.20,<1"]
-  core --> otel["opentelemetry-api / sdk / exporter-otlp-proto-common ==1.45.1"]
+  core --> otel["opentelemetry-api / sdk / exporter-otlp-proto-common ==1.45.2"]
   core --> httpx["httpx >=0.27,<1"]
   core -->|"runtime, optional"| col["OTLP/HTTP collector"]
   prom["Prometheus (reference)"] -->|"scrapes"| core
