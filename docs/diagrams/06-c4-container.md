@@ -11,7 +11,7 @@ C4Container
   Person(owner, "Owner / CI", "Runs checks")
 
   System_Boundary(b, "platform-observability repo") {
-    Container(pkg, "platform_observability package", "Python 3.12, starlette, prometheus-client, opentelemetry-sdk 1.45.1, httpx", "instrument(), Observed middleware, BoundedProcessor, SafeHTTPExporter")
+    Container(pkg, "platform_observability package", "Python 3.12, starlette, prometheus-client, opentelemetry-sdk 1.45.2, httpx", "instrument(), Observed middleware, BoundedProcessor, SafeHTTPExporter")
     Container(cli, "Contract and policy scripts", "Python stdlib", "check.py, check_schema_pin.py, check_registry_alignment.py, telemetry_policy.py")
     ContainerDb(schema, "Schemas and fixtures", "JSON files", "book-platform.contract.v1 schema + sha256 pin, redacted-telemetry-event.v1, fixtures/telemetry, fixtures/gates")
     Container(cfg, "Reference config", "YAML", "prometheus.yaml, shared-alerts.yaml, discovery-rbac.yaml")
